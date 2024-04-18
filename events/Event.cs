@@ -20,4 +20,9 @@ public class Event
         Id = Guid.NewGuid();
         
     }
+
+    public Event()
+    {
+        throw new NotImplementedException();
+    }
 }

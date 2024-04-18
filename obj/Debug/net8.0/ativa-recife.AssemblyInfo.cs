@@ -13,7 +13,7 @@ using System.Reflection;
 [assembly: System.Reflection.AssemblyCompanyAttribute("ativa-recife")]
 [assembly: System.Reflection.AssemblyConfigurationAttribute("Debug")]
 [assembly: System.Reflection.AssemblyFileVersionAttribute("1.0.0.0")]
-[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0")]
+[assembly: System.Reflection.AssemblyInformationalVersionAttribute("1.0.0+7864b268ffc4e378d06fd53078503393e50ace5b")]
 [assembly: System.Reflection.AssemblyProductAttribute("ativa-recife")]
 [assembly: System.Reflection.AssemblyTitleAttribute("ativa-recife")]
 [assembly: System.Reflection.AssemblyVersionAttribute("1.0.0.0")]

@@ -19,21 +19,41 @@ public static class EventsController
           
         });
 
-        group.MapDelete("", async (AddEventRequest request, AppDBContext appDbContext) =>
+        group.MapDelete("", async (string eventTitle, AppDBContext appDbContext) =>
         {
             EventRepositoryImp eventRepositoryImp = new EventRepositoryImp(appDbContext);
+    
             EventService eventService = new EventService(eventRepositoryImp);
-            var newEvent = new Event(request.Title, request.Description, request.Date, request.Hour, request.Local);
-            eventService.DeleteEvent(newEvent);
-        });
+    
+            Event eventToDelete = new Event { Title = eventTitle };
 
-        group.MapPut("", async (AddEventRequest request, AppDBContext appDbContext) =>
+            await eventService.DeleteEvent(eventToDelete);
+        });
+        
+        group.MapPut("", async ( Event updatedEvent, AppDBContext appDbContext) =>
         {
             EventRepositoryImp eventRepositoryImp = new EventRepositoryImp(appDbContext);
+    
             EventService eventService = new EventService(eventRepositoryImp);
-            var newEvent = new Event(request.Title, request.Description, request.Date, request.Hour, request.Local);
-            eventService.UpdateEvent(newEvent);
+
+            await eventService.UpdateEvent(updatedEvent);
         });
+        
+        group.MapGet("/{eventTitle}", async (string eventTitle, AppDBContext appDbContext) =>
+        {
+            EventRepositoryImp eventRepositoryImp = new EventRepositoryImp(appDbContext);
+    
+            EventService eventService = new EventService(eventRepositoryImp);
+    
+            Event getEvent = new Event { Title = eventTitle };
+
+            var existingEvent = await eventService.GetEventByTitle(getEvent);
+
+            return existingEvent;
+        });
+        
+        
+
     }
     
 }

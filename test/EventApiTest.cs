@@ -64,7 +64,7 @@ using Xunit;
             var content = new StringContent(System.Text.Json.JsonSerializer.Serialize(requestBody), Encoding.UTF8, "application/json");
 
             // Act
-            var response = await _httpClient.PutAsync($"{BaseUrl}/1", content); // Supondo que o evento com ID 1 exista
+            var response = await _httpClient.PutAsync($"{BaseUrl}/1", content); 
 
             // Assert
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);
@@ -74,7 +74,7 @@ using Xunit;
         public async Task DeleteEvent_ReturnsNoContent()
         {
             // Arrange & Act
-            var response = await _httpClient.DeleteAsync($"{BaseUrl}/1"); // Supondo que o evento com ID 1 exista
+            var response = await _httpClient.DeleteAsync($"{BaseUrl}/1"); 
 
             // Assert
             Assert.Equal(HttpStatusCode.NoContent, response.StatusCode);

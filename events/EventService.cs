@@ -1,83 +1,84 @@
+using System;
+using System.Threading.Tasks;
 using ativa_recife.data;
 using ativa_recife.Exception;
+using Microsoft.AspNetCore.Mvc;
 
-namespace ativa_recife.events;
-
-public class EventService
+namespace ativa_recife.events
 {
-    private readonly EventRepositoryImp _eventRepository;
-    public readonly AppDBContext _appDbContext;
-
-    public EventService(EventRepositoryImp eventRepository)
+    public class EventService
     {
-        _eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
-     
-    }
+        private readonly EventRepositoryImp _eventRepository;
 
-    public async Task<Event> CreateEvent(Event newEvent)
-    {
-        if (newEvent == null)
+        public EventService(EventRepositoryImp eventRepository)
         {
-            throw new ArgumentNullException(nameof(newEvent));
-        }
-        if (_eventRepository._appDbContext == null)
-        {
-            throw new AppDbContextNotInitializedException("AppDBContext não foi inicializado.");
+            _eventRepository = eventRepository ?? throw new ArgumentNullException(nameof(eventRepository));
         }
 
-        if (!_eventRepository._appDbContext.Database.CanConnect())
+        [HttpPost]
+        public async Task<Event> CreateEvent([FromBody] Event newEvent)
         {
-            throw new NotFoundException("Não foi possível estabelecer conexão com o banco de dados.");
+            if (newEvent == null)
+            {
+                throw new ArgumentNullException(nameof(newEvent));
+            }
+
+            if (_eventRepository._appDbContext == null)
+            {
+                throw new AppDbContextNotInitializedException("AppDBContext não foi inicializado.");
+            }
+
+            if (!_eventRepository._appDbContext.Database.CanConnect())
+            {
+                throw new NotFoundException("Não foi possível estabelecer conexão com o banco de dados.");
+            }
+
+            Event createdEvent = await _eventRepository.Create(newEvent);
+            return createdEvent;
         }
 
-        Event createdEvent = await _eventRepository.Create(newEvent);
-
-        return createdEvent;
-    }
-    
-    public async Task<Event> UpdateEvent(Event updatedEvent)
-    {
-        if (updatedEvent == null)
+        [HttpPut]
+        public async Task<Event> UpdateEvent([FromBody] Event updatedEvent)
         {
-            throw new ArgumentNullException(nameof(updatedEvent), "O evento atualizado não pode ser nulo.");
+            if (updatedEvent == null)
+            {
+                throw new ArgumentNullException(nameof(updatedEvent), "O evento atualizado não pode ser nulo.");
+            }
+
+            if (!_eventRepository._appDbContext.Database.CanConnect())
+            {
+                throw new NotFoundException("Não foi possível estabelecer conexão com o banco de dados.");
+            }
+
+            return await _eventRepository.Update(updatedEvent);
         }
 
-        if (!_eventRepository._appDbContext.Database.CanConnect())
+        [HttpDelete]
+        public async Task<Event> DeleteEvent(Event eventToDelete)
         {
-            throw new NotFoundException("Não foi possível estabelecer conexão com o banco de dados.");
+            if (eventToDelete == null)
+            {
+                throw new NotFoundException("O evento a ser excluído não pode ser nulo.");
+            }
+
+            if (!_eventRepository._appDbContext.Database.CanConnect())
+            {
+                throw new NotFoundException("Não foi possível estabelecer conexão com o banco de dados.");
+            }
+
+            return await _eventRepository.Delete(eventToDelete);
         }
 
-        return await _eventRepository.Update(updatedEvent);
-    }
-    
-    public async Task<Event> DeleteEvent(Event eventToDelete)
-    {
-        if (eventToDelete == null)
+        [HttpGet]
+        public async Task<Event> GetEventByTitle(Event getEvent)
         {
-            throw new NotFoundException( "O evento a ser excluído não pode ser nulo.");
+            if (string.IsNullOrEmpty(getEvent.Title))
+            {
+                throw new NotFoundException("O título do evento não pode ser nulo ou vazio.");
+            }
+
+            var existingEvent = await _eventRepository.GetEventByTitle(getEvent);
+            return existingEvent;
         }
-
-        // Verifica a conexão com o banco de dados
-        if (!_eventRepository._appDbContext.Database.CanConnect())
-        {
-            throw new NotFoundException("Não foi possível estabelecer conexão com o banco de dados.");
-        }
-
-        // Chama o método de exclusão do repositório
-        return await _eventRepository.Delete(eventToDelete);
-    }
-    
-    public async Task<Event> GetEventByTitle(Event getEvent)
-    {
-        // Verifica se o título do evento é válido
-        if (string.IsNullOrEmpty(getEvent.Title))
-        {
-            throw new NotFoundException("O título do evento não pode ser nulo ou vazio.");
-        }
-
-        // Chama o método correspondente no repositório para obter o evento pelo título
-        var existingEvent = await _eventRepository.GetEventByTitle(getEvent);
-
-        return existingEvent;
     }
 }
